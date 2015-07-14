@@ -15,11 +15,16 @@ ProjectName\Presentation\Nop.Web\scripts\
 
 To add javascript files into your NopCommerce platform you should add it to the following file.
 
-**Example: 1.0**
+
 
 ```sh
 ProjectName\Presentation\Nop.Web\Views\Shared\_Root.Head.cshtml
+```
 
+**Example: 1.0**
+
+
+```sh
 @{
     var displayMiniProfiler = EngineContext.Current.Resolve<Nop.Core.Domain.StoreInformationSettings>().DisplayMiniProfilerInPublicStore;
 
