@@ -1,0 +1,96 @@
+﻿@model TopMenuModel
+@using Nop.Core.Domain
+@using Nop.Core.Infrastructure
+@using Nop.Web.Models.Catalog;
+@{
+    var isRtl = this.ShouldUseRtlTheme();
+    var supportResponsive = EngineContext.Current.Resolve<StoreInformationSettings>().ResponsiveDesignSupported;
+}
+<div class="navbar-header">
+    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Categories</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+</div>
+
+@helper RenderCategoryLine(CategorySimpleModel category, int level, bool responsiveMobileMenu)
+{
+    <li class="dropdown">
+        <a href="@Url.RouteUrl("Category", new { SeName = category.SeName })" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            @category.Name
+            @if (category.NumberOfProducts.HasValue)
+            {
+                <text> </text>@T("Categories.TotalProducts", category.NumberOfProducts.Value)
+            }
+            @if (level == 0)
+            {
+                <span class="caret">
+                </span>
+            }
+            
+        </a>
+    @{
+        var levelClass = "";
+        if (level == 0)
+        {
+            levelClass = "firstLevel";
+        }
+        if (category.SubCategories.Count > 0)
+        {
+            if (responsiveMobileMenu)
+            {
+                <span class="expand">&nbsp;</span>
+            }
+            <ul class="dropdown-menu">
+                @foreach (var subCategory in category.SubCategories)
+                {
+                    @RenderCategoryLine(subCategory, level + 1, responsiveMobileMenu)
+                }
+            </ul>
+        }
+}
+</li>
+}
+<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <ul class="top-menu nav navbar-nav">
+        @Html.Widget("header_menu_before")
+
+        @foreach (var category in Model.Categories)
+        {
+            @RenderCategoryLine(category, 0, false)
+        }
+        @foreach (var topic in Model.Topics)
+        {
+            <li>
+                <a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    @topic.Name
+                </a>
+            </li>
+        }
+        @if (Model.Categories.Count == 0 && Model.Topics.Count == 0)
+        {
+            //no categories or topis to display? in this case let's diplay some default menu items (should we?)
+            <li><a href="@Url.RouteUrl("HomePage")">@T("HomePage")</a></li>
+            if (Model.RecentlyAddedProductsEnabled)
+            {
+                <li>
+                    <a href="@Url.RouteUrl("RecentlyAddedProducts")">@T("Products.NewProducts")</a>
+                </li>
+            }
+            <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a> </li>
+            <li><a href="@Url.RouteUrl("CustomerInfo")">@T("Account.MyAccount")</a></li>
+            if (Model.BlogEnabled)
+            {
+                <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+            }
+            if (Model.ForumEnabled)
+            {
+                <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
+            }
+            <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
+        }
+        @Html.Widget("header_menu_after")
+    </ul>
+</div>
